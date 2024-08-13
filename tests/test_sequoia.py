@@ -365,4 +365,4 @@ def test_certify(system_mock: Mock, output: Optional[Path]) -> None:
     assert sequoia.certify(key=Path("key"), certificate=Path("cert"), uid=Uid("uid"), output=output) == "return"
     name, args, kwargs = system_mock.mock_calls[0]
     if output:
-        assert str(output) == args[0][-1]
+        assert str(output) == args[0][-5]

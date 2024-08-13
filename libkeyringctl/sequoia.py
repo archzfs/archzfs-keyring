@@ -357,7 +357,8 @@ def certify(key: Path, certificate: Path, uid: Uid, output: Optional[Path]) -> s
     The result of the certification in case output is None
     """
 
-    cmd = ["sq", "pki", "certify", str(key), str(certificate), uid]
+    cmd = ["sq", "pki", "certify"]
     if output:
         cmd.extend(["--output", str(output)])
+    cmd.extend(["--certifier-file", str(key), str(certificate), uid])
     return system(cmd)

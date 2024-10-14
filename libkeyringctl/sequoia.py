@@ -316,7 +316,7 @@ def key_generate(uids: List[Uid], outfile: Path) -> str:
     The result of the key generate call
     """
 
-    cmd = ["sq", "key", "generate"]
+    cmd = ["sq", "key", "generate", "--without-password"]
     for uid in uids:
         cmd.extend(["--userid", str(uid)])
     cmd.extend(["--output", str(outfile)])

@@ -681,9 +681,9 @@ def test_build(working_dir: Path, keyring_dir: Path) -> None:
 
     keyring.build(working_dir=working_dir, keyring_root=keyring_dir, target_dir=output_dir)
     assert (
-        (output_dir / "archlinux.gpg").exists()
-        and (output_dir / "archlinux-trusted").exists()
-        and (output_dir / "archlinux-revoked").exists()
+        (output_dir / "archzfs.gpg").exists()
+        and (output_dir / "archzfs-trusted").exists()
+        and (output_dir / "archzfs-revoked").exists()
     )
 
 

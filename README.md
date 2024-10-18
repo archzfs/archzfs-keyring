@@ -1,9 +1,11 @@
-# archlinux-keyring
+# archzfs-keyring
 
-The archlinux-keyring project holds PGP packet material and tooling
-(`keyringctl`) to create the distribution keyring for Arch Linux.
+This is a fork of Arch Linux's [archlinux-keyring](https://gitlab.archlinux.org/archlinux/archlinux-keyring), customized for ArchZFS.
+
+The archzfs-keyring project holds PGP packet material and tooling
+(`keyringctl`) to create the distribution keyring for the ArchZFS Project.
 The keyring is used by pacman to establish the web of trust for the packagers
-of the distribution.
+of the project.
 
 The PGP packets describing the main signing keys can be found below the
 [keyring/main](keyring/main) directory, while those of the packagers are located below the
@@ -107,7 +109,7 @@ Verify certificates against modern expectations and assumptions
 
 ## Installation
 
-To install archlinux-keyring system-wide use the included `Makefile`:
+To install archzfs-keyring system-wide use the included `Makefile`:
 
 ```bash
 make install
@@ -120,47 +122,9 @@ how to provide fixes or improvements for the code base.
 
 ## Releases
 
-[Releases of
-archlinux-keyring](https://gitlab.archlinux.org/archlinux/archlinux-keyring/-/tags)
-are exclusively created by [keyring maintainers](https://gitlab.archlinux.org/archlinux/archlinux-keyring/-/project_members?with_inherited_permissions=exclude).
-
-The tags are signed with one of the following legitimate keys:
-
-```
-Christian Hesse <eworm@archlinux.org>
-02FD 1C7A 934E 6145 4584  9F19 A623 4074 498E 9CEE
-
-David Runge <dvzrv@archlinux.org>
-991F 6E3F 0765 CF62 9588  8586 139B 09DA 5BF0 D338
-
-Johannes Löthberg <demize@archlinux.org>
-5134 EF9E AF65 F95B 6BB1  608E 50FB 9B27 3A9D 0BB5
-
-Leonidas Spyropoulos <artafinde@archlinux.org>
-B4B7 5962 5D46 3343 0B74  8770 59E4 3E10 6B24 7368
-
-Levente Polyak <anthraxx@archlinux.org>
-E240 B57E 2C46 30BA 768E  2F26 FC1B 547C 8D81 72C8
-
-Morten Linderud <foxboron@archlinux.org>
-C100 3466 7663 4E80 C940  FB9E 9C02 FF41 9FEC BE16
-```
-
-To verify a tag, first import the relevant PGP keys:
-
-```bash
-gpg --auto-key-locate wkd --search-keys <email-from-above>
-```
-
-Afterwards a tag can be verified from a clone of this repository. Please note
-that one **must** check the used key of the signature against the legitimate
-keys listed above:
-
-```bash
-git verify-tag <tag>
-```
+TBA
 
 ## License
 
-Archlinux-keyring is licensed under the terms of the **GPL-3.0-or-later** (see
+Archzfs-keyring is licensed under the terms of the **GPL-3.0-or-later** (see
 [LICENSE](LICENSE)).

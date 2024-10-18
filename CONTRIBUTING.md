@@ -1,25 +1,24 @@
 # Contributing
 
-These are the contribution guidelines for archlinux-keyring.
+These are the contribution guidelines for archzfs-keyring.
 All code contributions fall under the terms of the GPL-3.0-or-later (see
 [LICENSE](LICENSE)).
 
-Please read our distribution-wide [Code of
+Please read the Arch Linux's [Code of
 Conduct](https://terms.archlinux.org/docs/code-of-conduct/) before
 contributing, to understand what actions will and will not be tolerated.
 
-Development of archlinux-keyring takes place on Arch Linux' Gitlab:
-https://gitlab.archlinux.org/archlinux/archlinux-keyring.
+Development of archzfs-keyring takes place on ArchZFS GitHub:
+https://github.com/archzfs.
 
 Any merge request to the repository requires two approvals of authorized
 approvers (the current main key holders).
 
 ## Discussion
 
-Discussion around archlinux-keyring may take place on the [arch-projects
-mailing list](https://lists.archlinux.org/listinfo/arch-projects) and in
-[#archlinux-projects](ircs://irc.libera.chat/archlinux-projects) on [Libera
-Chat](https://libera.chat/).
+Discussion around archzfs-keyring may take place in [ArchZFS
+Discussions](https://github.com/orgs/archzfs/discussions) and in [ArchZFS
+Discord](https://discord.gg/TZsb3cwdUM).
 
 ## Requirements
 

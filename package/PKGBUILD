@@ -1,0 +1,28 @@
+pkgname=archzfs-keyring
+pkgver=20241022
+pkgrel=1
+pkgdesc='ArchZFS PGP keyring'
+arch=('any')
+url='https://github.com/archzfs/archzfs-keyring'
+license=('GPL-3.0-or-later')
+install=$pkgname.install
+depends=('pacman')
+makedepends=('git' 'python' 'sequoia-sq' 'pkgconf' 'systemd')
+checkdepends=('python-coverage' 'python-pytest')
+source=("archzfs-keyring::git+file://$(pwd)/..")
+
+build() {
+  cd "${pkgname}"
+  make build
+}
+
+check() {
+  cd "${pkgname}"
+  make check
+}
+
+package() {
+  cd "${pkgname}"
+  make PREFIX='/usr' DESTDIR="${pkgdir}" install
+}
+

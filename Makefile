@@ -6,7 +6,7 @@ RELEASE ?=
 SCRIPT_TARGET_DIR ?= $(PREFIX)/bin
 SYSTEMD_SYSTEM_UNIT_DIR ?= $(shell pkgconf --variable systemd_system_unit_dir systemd)
 WKD_FQDN ?= archlinux.org
-WKD_BUILD_DIR ?= $(BUILD_DIR)/wkd
+WKD_BUILD_DIR ?= $(BUILD_DIR)/wkd/.well-known/
 KEYRING_FILE=archlinux.gpg
 KEYRING_REVOKED_FILE=archlinux-revoked
 KEYRING_TRUSTED_FILE=archlinux-trusted
@@ -42,10 +42,10 @@ build: $(SOURCES)
 	./keyringctl -v build
 
 wkd: build
-	sq -f network wkd generate -s $(WKD_BUILD_DIR)/ $(WKD_FQDN) $(BUILD_DIR)/$(KEYRING_FILE)
+	wkd-exporter --domain $(WKD_FQDN) $(WKD_BUILD_DIR) < $(BUILD_DIR)/$(KEYRING_FILE)
 
 wkd_inspect: wkd
-	for file in $(WKD_BUILD_DIR)/.well-known/openpgpkey/$(WKD_FQDN)/hu/*; do sq inspect $$file; done
+	for file in $(WKD_BUILD_DIR)/openpgpkey/$(WKD_FQDN)/hu/*; do sq inspect --certifications $$file; done
 
 wkd_sync_service: wkd_sync/$(WKD_SYNC_SERVICE_IN)
 	sed -e 's|SCRIPT_TARGET_DIR|$(SCRIPT_TARGET_DIR)|' wkd_sync/$(WKD_SYNC_SERVICE_IN) > $(BUILD_DIR)/$(WKD_SYNC_SERVICE)

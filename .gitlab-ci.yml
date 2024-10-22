@@ -80,7 +80,7 @@ pages:
     - secure
   before_script:
     - pacman-key --init
-    - pacman -Syu --needed --noconfirm make python sequoia-sq
+    - pacman -Syu --needed --noconfirm make python sequoia-sq wkd-exporter
   script:
     - make wkd
     - make wkd WKD_FQDN=master-key.archlinux.org

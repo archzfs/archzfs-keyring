@@ -67,13 +67,8 @@ release: clean build
 	# NOTE: we specify GITLAB_HOST, because otherwise glab YOLO uses whatever is specified by the `host` key in its config and silently breaks all links...
 	GITLAB_HOST=gitlab.archlinux.org glab release create $(RELEASE) ./build/$(PROJECT)-$(RELEASE).tar.gz* --name=$(RELEASE) --notes="release version $(RELEASE)"
 
-install: build wkd_sync_service
+install: build
 	install -vDm 644 build/{$(KEYRING_FILE),$(KEYRING_REVOKED_FILE),$(KEYRING_TRUSTED_FILE)} -t $(DESTDIR)$(KEYRING_TARGET_DIR)
-	install -vDm 755 wkd_sync/$(WKD_SYNC_SCRIPT) -t $(DESTDIR)$(SCRIPT_TARGET_DIR)
-	install -vDm 644 build/$(WKD_SYNC_SERVICE) -t $(DESTDIR)$(SYSTEMD_SYSTEM_UNIT_DIR)
-	install -vDm 644 wkd_sync/$(WKD_SYNC_TIMER) -t $(DESTDIR)$(SYSTEMD_SYSTEM_UNIT_DIR)
-	install -vdm 755 $(DESTDIR)$(SYSTEMD_TIMER_DIR)
-	ln -fsv ../$(WKD_SYNC_TIMER) $(DESTDIR)$(SYSTEMD_TIMER_DIR)/$(WKD_SYNC_TIMER)
 
 uninstall:
 	rm -fv $(DESTDIR)$(KEYRING_TARGET_DIR)/{$(KEYRING_FILE),$(KEYRING_REVOKED_FILE),$(KEYRING_TRUSTED_FILE)}

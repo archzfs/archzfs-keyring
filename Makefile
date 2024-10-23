@@ -83,4 +83,4 @@ uninstall:
 	rm -v $(DESTDIR)$(SYSTEMD_TIMER_DIR)/$(WKD_SYNC_TIMER)
 	rmdir -pv --ignore-fail-on-non-empty $(DESTDIR)$(SYSTEMD_TIMER_DIR)
 
-.PHONY: all lint fmt check test clean install release uninstall wkd wkd_inspect
+.PHONY: all build lint fmt check test clean install release uninstall wkd wkd_inspect

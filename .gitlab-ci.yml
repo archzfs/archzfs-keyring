@@ -26,9 +26,13 @@ test:
   needs: []
   before_script:
     - pacman-key --init
-    - pacman -Syu --needed --noconfirm make python sequoia-sq python-coverage python-pytest python-tomli
+    - pacman -Syu --needed --noconfirm make python sequoia-sq python-coverage python-pytest python-tomli wkd-exporter
   script:
     - make test
+    - make wkd
+    - make wkd WKD_FQDN=master-key.archlinux.org
+    - make wkd_inspect
+    - make wkd_inspect WKD_FQDN=master-key.archlinux.org
   only:
     changes:
       - keyringctl
@@ -80,7 +84,7 @@ pages:
     - secure
   before_script:
     - pacman-key --init
-    - pacman -Syu --needed --noconfirm make python sequoia-sq
+    - pacman -Syu --needed --noconfirm make python sequoia-sq wkd-exporter
   script:
     - make wkd
     - make wkd WKD_FQDN=master-key.archlinux.org

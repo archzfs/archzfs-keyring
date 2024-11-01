@@ -49,7 +49,7 @@ def keyring_split(working_dir: Path, keyring: Path, preserve_filename: bool = Fa
     keyring_dir = Path(mkdtemp(dir=working_dir, prefix="keyring-")).absolute()
 
     with cwd(keyring_dir):
-        system(["sq", "toolbox", "keyring", "split", str(keyring)])
+        system(["sq", "toolbox", "keyring", "split", "--prefix", "''", str(keyring)])
 
     keyrings: List[Path] = list(natural_sort_path(keyring_dir.iterdir()))
 
@@ -77,7 +77,7 @@ def keyring_merge(certificates: List[Path], output: Optional[Path] = None, force
 
     cmd = ["sq", "toolbox", "keyring", "merge"]
     if force:
-        cmd.insert(1, "--force")
+        cmd.insert(1, "--overwrite")
     if output:
         cmd += ["--output", str(output)]
     cmd += [str(cert) for cert in sorted(certificates)]
@@ -123,7 +123,7 @@ def packet_join(packets: List[Path], output: Optional[Path] = None, force: bool 
 
     cmd = ["sq", "toolbox", "packet", "join"]
     if force:
-        cmd.insert(1, "--force")
+        cmd.insert(1, "--overwrite")
     packets_str = list(map(lambda path: str(path), packets))
     cmd.extend(packets_str)
     cmd.extend(["--output", str(output)])
@@ -174,7 +174,7 @@ def packet_dump(packet: Path) -> str:
     The contents of the packet dump
     """
 
-    return system(["sq", "toolbox", "packet", "dump", str(packet)])
+    return system(["sq", "toolbox", "packet", "dump", str(packet)], ignore_stderr=True)
 
 
 def packet_dump_field(packet: Path, query: str) -> str:
@@ -319,7 +319,7 @@ def key_generate(uids: List[Uid], outfile: Path) -> str:
     cmd = ["sq", "key", "generate", "--without-password"]
     for uid in uids:
         cmd.extend(["--userid", str(uid)])
-    cmd.extend(["--output", str(outfile)])
+    cmd.extend(["--output", str(outfile), "--rev-cert", f"{str(outfile)}.rev"])
     return system(cmd)
 
 
@@ -357,8 +357,8 @@ def certify(key: Path, certificate: Path, uid: Uid, output: Optional[Path]) -> s
     The result of the certification in case output is None
     """
 
-    cmd = ["sq", "pki", "certify"]
+    cmd = ["sq", "pki", "vouch", "certify"]
     if output:
         cmd.extend(["--output", str(output)])
-    cmd.extend(["--certifier-file", str(key), str(certificate), uid])
+    cmd.extend(["--certifier-file", str(key), "--cert-file", str(certificate), "--userid", uid])
     return system(cmd)

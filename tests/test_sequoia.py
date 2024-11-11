@@ -166,7 +166,7 @@ def test_inspect(
 def test_packet_dump(system_mock: Mock) -> None:
     system_mock.return_value = "return"
     assert sequoia.packet_dump(packet=Path("packet")) == "return"
-    system_mock.assert_called_once_with(["sq", "toolbox", "packet", "dump", "packet"])
+    system_mock.assert_called_once_with(["sq", "toolbox", "packet", "dump", "packet"], ignore_stderr=True)
 
 
 @mark.parametrize(

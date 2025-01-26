@@ -49,7 +49,7 @@ def keyring_split(working_dir: Path, keyring: Path, preserve_filename: bool = Fa
     keyring_dir = Path(mkdtemp(dir=working_dir, prefix="keyring-")).absolute()
 
     with cwd(keyring_dir):
-        system(["sq", "toolbox", "keyring", "split", "--prefix", "''", str(keyring)])
+        system(["sq", "--home", "none", "--cert-store", "none", "keyring", "split", "--prefix", "''", str(keyring)])
 
     keyrings: List[Path] = list(natural_sort_path(keyring_dir.iterdir()))
 
@@ -75,7 +75,7 @@ def keyring_merge(certificates: List[Path], output: Optional[Path] = None, force
     The result if no output file has been used
     """
 
-    cmd = ["sq", "toolbox", "keyring", "merge"]
+    cmd = ["sq", "--home", "none", "--cert-store", "none", "keyring", "merge"]
     if force:
         cmd.insert(1, "--overwrite")
     if output:
@@ -103,7 +103,7 @@ def packet_split(working_dir: Path, certificate: Path) -> Iterable[Path]:
     packet_dir = Path(mkdtemp(dir=working_dir, prefix="packet-")).absolute()
 
     with cwd(packet_dir):
-        system(["sq", "toolbox", "packet", "split", "--prefix", "''", str(certificate)])
+        system(["sq", "--home", "none", "--cert-store", "none", "packet", "split", "--output-prefix", "''", str(certificate)])
     return natural_sort_path(packet_dir.iterdir())
 
 
@@ -121,7 +121,7 @@ def packet_join(packets: List[Path], output: Optional[Path] = None, force: bool 
     The result if no output file has been used
     """
 
-    cmd = ["sq", "toolbox", "packet", "join"]
+    cmd = ["sq", "--home", "none", "--cert-store", "none", "packet", "join"]
     if force:
         cmd.insert(1, "--overwrite")
     packets_str = list(map(lambda path: str(path), packets))
@@ -146,7 +146,7 @@ def inspect(
     The result of the inspection
     """
 
-    cmd = ["sq", "inspect"]
+    cmd = ["sq", "--home", "none", "--cert-store", "none", "inspect"]
     if certifications:
         cmd.append("--certifications")
     cmd.append(str(packet))
@@ -174,7 +174,7 @@ def packet_dump(packet: Path) -> str:
     The contents of the packet dump
     """
 
-    return system(["sq", "toolbox", "packet", "dump", str(packet)], ignore_stderr=True)
+    return system(["sq", "--home", "none", "--cert-store", "none", "packet", "dump", str(packet)], ignore_stderr=True)
 
 
 def packet_dump_field(packet: Path, query: str) -> str:
@@ -316,7 +316,7 @@ def key_generate(uids: List[Uid], outfile: Path) -> str:
     The result of the key generate call
     """
 
-    cmd = ["sq", "key", "generate", "--without-password"]
+    cmd = ["sq", "--home", "none", "--cert-store", "none", "key", "generate", "--without-password", "--own-key"]
     for uid in uids:
         cmd.extend(["--userid", str(uid)])
     cmd.extend(["--output", str(outfile), "--rev-cert", f"{str(outfile)}.rev"])
@@ -336,7 +336,7 @@ def key_extract_certificate(key: Path, output: Optional[Path]) -> str:
     The result of the extract in case output is None
     """
 
-    cmd = ["sq", "toolbox", "extract-cert", str(key)]
+    cmd = ["sq", "--keyring", str(key), "--home", "none", "cert", "export", "--all"]
     if output:
         cmd.extend(["--output", str(output)])
     return system(cmd)
@@ -357,7 +357,7 @@ def certify(key: Path, certificate: Path, uid: Uid, output: Optional[Path]) -> s
     The result of the certification in case output is None
     """
 
-    cmd = ["sq", "pki", "vouch", "certify"]
+    cmd = ["sq", "--home", "none", "--cert-store", "none", "pki", "vouch", "add"]
     if output:
         cmd.extend(["--output", str(output)])
     cmd.extend(["--certifier-file", str(key), "--cert-file", str(certificate), "--userid", uid])

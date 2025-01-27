@@ -256,21 +256,23 @@ def create_signature_revocation(
                     )
 
                     revoked_certificate = system(["gpg", "--armor", "--export", f"{certified_fingerprint}"], env=env)
-                    certificate.truncate(0)
-                    certificate.seek(0)
-                    certificate.write(revoked_certificate.encode())
-                    certificate.flush()
 
-                    target_dir = keyring_root / "packager"
-                    decomposed_path: Path = convert_certificate(
-                        working_dir=working_dir,
-                        certificate=certificate_path,
-                        keyring_dir=target_dir,
-                        fingerprint_filter=test_all_fingerprints,
-                    )
-                    user_dir = decomposed_path.parent
-                    (target_dir / user_dir.name).mkdir(parents=True, exist_ok=True)
-                    copytree(src=user_dir, dst=(target_dir / user_dir.name), dirs_exist_ok=True)
+            with NamedTemporaryFile(dir=str(working_dir), prefix=f"{certified}", suffix=".asc") as certificate:
+                certificate_path: Path = Path(certificate.name)
+
+                certificate.write(revoked_certificate.encode())
+                certificate.flush()
+
+                target_dir = keyring_root / "packager"
+                decomposed_path: Path = convert_certificate(
+                    working_dir=working_dir,
+                    certificate=certificate_path,
+                    keyring_dir=target_dir,
+                    fingerprint_filter=test_all_fingerprints,
+                )
+                user_dir = decomposed_path.parent
+                (target_dir / user_dir.name).mkdir(parents=True, exist_ok=True)
+                copytree(src=user_dir, dst=(target_dir / user_dir.name), dirs_exist_ok=True)
 
             decorated_func(working_dir=working_dir, *args, **kwargs)
 

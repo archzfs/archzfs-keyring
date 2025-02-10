@@ -205,12 +205,12 @@ def create_signature_revocation(
             certified_fingerprint = keyring_certificate.name
 
             with NamedTemporaryFile(dir=str(working_dir), prefix=f"{certified}", suffix=".asc") as certificate:
-                certificate_path: Path = Path(certificate.name)
+                issuer_certificate_path: Path = Path(certificate.name)
                 export(
                     working_dir=working_dir,
                     keyring_root=keyring_root,
                     sources=[keyring_certificate],
-                    output=certificate_path,
+                    output=issuer_certificate_path,
                 )
 
                 with TemporaryDirectory(prefix="gnupg") as gnupg_home:
@@ -223,7 +223,7 @@ def create_signature_revocation(
                                 "--no-auto-check-trustdb",
                                 "--import",
                                 f"{str(issuer_key)}",
-                                f"{str(certificate_path)}",
+                                f"{str(issuer_certificate_path)}",
                             ],
                             env=env,
                         )

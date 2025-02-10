@@ -103,7 +103,20 @@ def packet_split(working_dir: Path, certificate: Path) -> Iterable[Path]:
     packet_dir = Path(mkdtemp(dir=working_dir, prefix="packet-")).absolute()
 
     with cwd(packet_dir):
-        system(["sq", "--home", "none", "--cert-store", "none", "packet", "split", "--output-prefix", "''", str(certificate)])
+        system(
+            [
+                "sq",
+                "--home",
+                "none",
+                "--cert-store",
+                "none",
+                "packet",
+                "split",
+                "--output-prefix",
+                "''",
+                str(certificate),
+            ]
+        )
     return natural_sort_path(packet_dir.iterdir())
 
 

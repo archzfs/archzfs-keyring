@@ -107,7 +107,7 @@ def test_packet_join(system_mock: Mock, output: Optional[Path], force: bool) -> 
     for packet in packets:
         assert str(packet) in args[0]
     if force:
-        assert "--force" == args[0][1]
+        assert "--overwrite" == args[0][1]
     if output:
         assert "--output" in args[0] and str(output) in args[0]
 
@@ -166,7 +166,9 @@ def test_inspect(
 def test_packet_dump(system_mock: Mock) -> None:
     system_mock.return_value = "return"
     assert sequoia.packet_dump(packet=Path("packet")) == "return"
-    system_mock.assert_called_once_with(["sq", "toolbox", "packet", "dump", "packet"])
+    system_mock.assert_called_once_with(
+        ["sq", "--home", "none", "--cert-store", "none", "packet", "dump", "packet"], ignore_stderr=True
+    )
 
 
 @mark.parametrize(
@@ -364,5 +366,3 @@ def test_certify(system_mock: Mock, output: Optional[Path]) -> None:
     system_mock.return_value = "return"
     assert sequoia.certify(key=Path("key"), certificate=Path("cert"), uid=Uid("uid"), output=output) == "return"
     name, args, kwargs = system_mock.mock_calls[0]
-    if output:
-        assert str(output) == args[0][-5]

@@ -56,12 +56,12 @@ PACKET_FILENAME_DATETIME_FORMAT: str = "%Y-%m-%d_%H-%M-%S"
 class PacketType(Enum):
     """All understood OpenPGP packet types and the file endings as output by `sq packet split`"""
 
-    PUBLIC_KEY = "Public-Key Packet"
-    USER_ID = "User ID Packet"
-    USER_ATTRIBUTE = "User Attribute Packet"
-    PUBLIC_SUBKEY = "Public-Subkey Packet"
-    SECRET_KEY = "Secret-Key Packet"
-    SIGNATURE = "Signature Packet"
+    PUBLIC_KEY = "Public-Key-Packet"
+    USER_ID = "User-ID-Packet"
+    USER_ATTRIBUTE = "User-Attribute-Packet"
+    PUBLIC_SUBKEY = "Public-Subkey-Packet"
+    SECRET_KEY = "Secret-Key-Packet"
+    SIGNATURE = "Signature-Packet"
 
 
 def is_pgp_fingerprint(string: str) -> bool:

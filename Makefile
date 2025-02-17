@@ -42,7 +42,7 @@ build: $(SOURCES)
 	./keyringctl -v build
 
 wkd: build
-	wkd-exporter --domain $(WKD_FQDN) $(WKD_BUILD_DIR) < $(BUILD_DIR)/$(KEYRING_FILE)
+	wkd-exporter --append --domain $(WKD_FQDN) $(WKD_BUILD_DIR) < $(BUILD_DIR)/$(KEYRING_FILE)
 
 wkd_inspect: wkd
 	for file in $(WKD_BUILD_DIR)/openpgpkey/$(WKD_FQDN)/hu/*; do sq inspect --certifications $$file; done

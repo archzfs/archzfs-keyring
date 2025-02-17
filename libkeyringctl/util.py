@@ -104,6 +104,7 @@ def system(
     _stdin: Optional[IO[AnyStr]] = None,
     exit_on_error: bool = False,
     env: Optional[Dict[str, str]] = None,
+    ignore_stderr: bool = False,
 ) -> str:
     """Execute a command using check_output
 
@@ -126,7 +127,7 @@ def system(
         env = {"HOME": environ["HOME"], "PATH": environ["PATH"], "LANG": "en_US.UTF-8"}
 
     try:
-        return check_output(cmd, stderr=STDOUT, stdin=_stdin, env=env).decode()
+        return check_output(cmd, stderr=None if ignore_stderr else STDOUT, stdin=_stdin, env=env).decode()
     except CalledProcessError as e:
         stderr.buffer.write(e.stdout)
         print_stack()

@@ -45,7 +45,7 @@ wkd: build
 	wkd-exporter --append --domain $(WKD_FQDN) $(WKD_BUILD_DIR) < $(BUILD_DIR)/$(KEYRING_FILE)
 
 wkd_inspect: wkd
-	for file in $(WKD_BUILD_DIR)/openpgpkey/$(WKD_FQDN)/hu/*; do sq inspect --certifications $$file; done
+	for file in $(WKD_BUILD_DIR)/openpgpkey/$(WKD_FQDN)/hu/*; do sq inspect --certifications $$file; gpg --list-packets $$file || exit 1; done
 
 wkd_sync_service: wkd_sync/$(WKD_SYNC_SERVICE_IN)
 	sed -e 's|SCRIPT_TARGET_DIR|$(SCRIPT_TARGET_DIR)|' wkd_sync/$(WKD_SYNC_SERVICE_IN) > $(BUILD_DIR)/$(WKD_SYNC_SERVICE)

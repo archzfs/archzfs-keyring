@@ -1,0 +1,202 @@
+---
+name: CI
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/**
+      - Makefile
+      - keyring/**
+      - keyringctl
+      - libkeyringctl/**
+      - package/**
+      - tests/**
+  pull_request:
+    branches:
+      - master
+    paths:
+      - .github/workflows/**
+      - Makefile
+      - keyring/**
+      - keyringctl
+      - libkeyringctl/**
+      - package/**
+      - tests/**
+
+jobs:
+
+  lint:
+
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
+    steps:
+
+      - name: Install dependencies
+        env:
+          packages: >
+            flake8
+            git
+            make
+            mypy
+            python-black
+            python-isort
+        run: |
+          pacman-key --init
+          pacman -Syu --needed --noconfirm ${packages}
+
+      - name: Checkout the repository
+        uses: actions/checkout@v4.2.1
+
+      - name: Run lint
+        run: make lint
+
+  test:
+
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
+    steps:
+
+      - name: Install dependencies
+        env:
+          packages: >
+            git
+            make
+            python
+            python-coverage
+            python-pytest
+            python-tomli
+            sequoia-sq
+        run: |
+          pacman-key --init
+          pacman -Syu --needed --noconfirm ${packages}
+
+      - name: Checkout the repository
+        uses: actions/checkout@v4.2.1
+
+      - name: Run tests
+        run: make test
+
+      - name: Store the coverage report
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          include-hidden-files: true
+          name: coverage-report
+          path: .coverage
+
+  coverage:
+
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v4.2.1
+
+      - name: Retrieve the coverage reports
+        uses: actions/download-artifact@v4.1.8
+        with:
+          merge-multiple: true
+          name: coverage-report
+
+      - name: Process the coverage reports
+        id: coverage_processing
+        uses: py-cov-action/python-coverage-comment-action@v3.29
+        with:
+          COVERAGE_DATA_BRANCH: 'COVERAGE-REPORT'
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Store the pull request coverage comment for later posting
+        if: steps.coverage_processing.outputs.COMMENT_FILE_WRITTEN == 'true'
+        uses: actions/upload-artifact@v4.4.3
+        with:
+          name: python-coverage-comment-action
+          path: python-coverage-comment-action.txt
+
+  build:
+
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
+    steps:
+
+      - name: Install dependencies
+        env:
+          packages: >
+            git
+            make
+            pkgconf
+            python
+            sequoia-sq
+            systemd
+        run: |
+          pacman-key --init
+          pacman -Syu --needed --noconfirm ${packages}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.1
+
+      - name: Build and install
+        run: |
+          make
+          make install PREFIX=/usr
+
+  keyring_check:
+
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
+    steps:
+
+      - name: Install dependencies
+        env:
+          packages: >
+            git
+            make
+            python
+            sequoia-sq
+        run: |
+          pacman-key --init
+          pacman -Syu --needed --noconfirm ${packages}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.1
+
+      - name: Check keyring
+        run: |
+          chown root:root .
+          ./keyringctl check
+          ./keyringctl ci
+
+  package:
+
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+
+    steps:
+
+      - name: Install dependencies
+        run: |
+          pacman-key --init
+          pacman -Syu --needed --noconfirm git
+
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.1
+
+      - name: Set up build user
+        run: |
+          groupadd -r packager
+          useradd -g packager -mr packager
+          echo "packager ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
+
+      - name: Build package
+        run: |
+          chown -R packager:packager .
+          sudo -u packager makepkg --dir package --noconfirm --skipinteg --syncdeps

@@ -2,6 +2,7 @@ SHELL = /bin/bash
 PREFIX ?= /usr/local
 BUILD_DIR ?= build
 KEYRING_TARGET_DIR ?= $(PREFIX)/share/pacman/keyrings/
+SIGNINGKEY = $(shell git config --local --get user.signingkey)
 RELEASE ?=
 SCRIPT_TARGET_DIR ?= $(PREFIX)/bin
 SYSTEMD_SYSTEM_UNIT_DIR ?= $(shell pkgconf --variable systemd_system_unit_dir systemd)
@@ -54,6 +55,7 @@ clean:
 	rm -rf $(BUILD_DIR) $(WKD_BUILD_DIR)
 
 release: clean build
+	$(if $(SIGNINGKEY),,$(error No explicit signing key in local git config given!))
 	$(if $(RELEASE),,$(error RELEASE was not specified!))
 	@glab auth status -h gitlab.archlinux.org
 	@git tag -s $(RELEASE) -m "release version $(RELEASE)"
@@ -61,7 +63,7 @@ release: clean build
 	@mkdir -p $(BUILD_DIR)/$(PROJECT)-$(RELEASE)/
 	@cp $(BUILD_DIR)/{$(KEYRING_FILE),$(KEYRING_REVOKED_FILE),$(KEYRING_TRUSTED_FILE)} $(BUILD_DIR)/$(PROJECT)-$(RELEASE)/
 	@tar cvfz $(BUILD_DIR)/$(PROJECT)-$(RELEASE).tar.gz -C $(BUILD_DIR)/ $(PROJECT)-$(RELEASE)/
-	@gpg -o $(BUILD_DIR)/$(PROJECT)-$(RELEASE).tar.gz.sig --default-key "$(shell git config --local --get user.signingkey)" -s $(BUILD_DIR)/$(PROJECT)-$(RELEASE).tar.gz
+	@gpg -o $(BUILD_DIR)/$(PROJECT)-$(RELEASE).tar.gz.sig --default-key $(SIGNINGKEY) -s $(BUILD_DIR)/$(PROJECT)-$(RELEASE).tar.gz
 	# NOTE: we specify GITLAB_HOST, because otherwise glab YOLO uses whatever is specified by the `host` key in its config and silently breaks all links...
 	GITLAB_HOST=gitlab.archlinux.org glab release create $(RELEASE) ./build/$(PROJECT)-$(RELEASE).tar.gz* --name=$(RELEASE) --notes="release version $(RELEASE)"
 

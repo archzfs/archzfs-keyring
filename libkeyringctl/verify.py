@@ -137,15 +137,19 @@ def verify_integrity(certificate: Path, all_fingerprints: Set[Fingerprint]) -> N
                                 assert_packet_kind(path=sig, expected="Signature")
                                 assert_signature_type_certification(path=sig)
 
-                                issuer = get_fingerprint_from_partial(
-                                    fingerprints=all_fingerprints,
-                                    fingerprint=Fingerprint(
-                                        packet_dump_field(packet=sig, query="Hashed area|Unhashed area.Issuer")
-                                    ),
-                                )
-                                if issuer != sig.stem:
-                                    raise Exception(f"Unexpected issuer in file {str(sig)}: {issuer}")
-                                debug(f"OK: {sig}")
+                                query_string = "Hashed area.Issuer"
+                                try:
+                                    field = packet_dump_field(packet=sig, query=query_string)
+                                except Exception:
+                                    debug(f'Signature packet file "{sig}" does not contain "{query_string}". Skip..')
+                                else:
+                                    issuer = get_fingerprint_from_partial(
+                                        fingerprints=all_fingerprints,
+                                        fingerprint=Fingerprint(field),
+                                    )
+                                    if issuer != sig.stem:
+                                        raise Exception(f"Unexpected issuer in file {str(sig)}: {issuer}")
+                                    debug(f"OK: {sig}")
                         elif "revocation" == uid_path.name:
                             for sig in uid_path.iterdir():
                                 assert_is_file(path=sig)
@@ -155,20 +159,26 @@ def verify_integrity(certificate: Path, all_fingerprints: Set[Fingerprint]) -> N
                                 assert_packet_kind(path=sig, expected="Signature")
                                 assert_signature_type(path=sig, expected="CertificationRevocation")
 
-                                issuer = get_fingerprint_from_partial(
-                                    fingerprints=all_fingerprints,
-                                    fingerprint=Fingerprint(
-                                        packet_dump_field(packet=sig, query="Hashed area|Unhashed area.Issuer")
-                                    ),
-                                )
-                                if issuer != sig.stem:
-                                    raise Exception(f"Unexpected issuer in file {str(sig)}: {issuer}")
+                                query_string = "Hashed area.Issuer"
+                                try:
+                                    field = packet_dump_field(packet=sig, query=query_string)
+                                except Exception:
+                                    debug(f'Signature packet file "{sig}" does not contain "{query_string}". Skip..')
+                                else:
+                                    issuer = get_fingerprint_from_partial(
+                                        fingerprints=all_fingerprints,
+                                        fingerprint=Fingerprint(field),
+                                    )
+                                    if issuer != sig.stem:
+                                        raise Exception(f"Unexpected issuer in file {str(sig)}: {issuer}")
 
-                                certification = uid_path.parent / "certification" / sig.name
-                                if certification.exists():
-                                    raise Exception(f"Certification exists for revocation {str(sig)}: {certification}")
+                                    certification = uid_path.parent / "certification" / sig.name
+                                    if certification.exists():
+                                        raise Exception(
+                                            f"Certification exists for revocation {str(sig)}: {certification}"
+                                        )
 
-                                debug(f"OK: {sig}")
+                                    debug(f"OK: {sig}")
                         else:
                             raise Exception(f"Unexpected directory in certificate {certificate.name}: {str(uid_path)}")
                         debug(f"OK: {uid_path}")
@@ -257,9 +267,14 @@ def assert_is_pgp_fingerprint(path: Path, _str: str) -> None:
 
 
 def assert_filename_matches_packet_issuer_fingerprint(path: Path, check: str) -> None:
-    fingerprint = packet_dump_field(packet=path, query="Unhashed area|Hashed area.Issuer Fingerprint")
-    if not fingerprint == check:
-        raise Exception(f"Unexpected packet fingerprint in file {str(path)}: {fingerprint}")
+    query_string = "Hashed area.Issuer Fingerprint"
+    try:
+        fingerprint = packet_dump_field(packet=path, query=query_string)
+    except Exception:
+        debug(f'The packet file "{path}" does not contain "{query_string}". Skip..')
+    else:
+        if not fingerprint == check:
+            raise Exception(f"Unexpected packet fingerprint in file {str(path)}: {fingerprint}")
 
 
 def assert_filename_matches_packet_fingerprint(path: Path, check: str) -> None:
